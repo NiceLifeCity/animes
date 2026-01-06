@@ -451,24 +451,22 @@
             }
 
             .badge.rating-gold {
-                background: linear-gradient(135deg, #ffd700, #ffb700);
-                border: 2px solid #ffd700;
-                color: #000;
+                background: rgba(255, 215, 0, 0.25);
+                border: 1px solid #ffd700;
+                color: #ffd700;
                 font-weight: 700;
                 font-size: 0.8em;
-                padding: 6px 14px;
-                box-shadow: 0 4px 15px rgba(255, 215, 0, 0.6);
+                padding: 4px 10px;
                 text-transform: none;
             }
 
             .badge.rating-orange {
-                background: linear-gradient(135deg, #ff8c00, #ff6600);
-                border: 2px solid #ff8c00;
-                color: #fff;
+                background: rgba(255, 140, 0, 0.25);
+                border: 1px solid #ff8c00;
+                color: #ff8c00;
                 font-weight: 700;
                 font-size: 0.8em;
-                padding: 6px 14px;
-                box-shadow: 0 4px 15px rgba(255, 140, 0, 0.6);
+                padding: 4px 10px;
                 text-transform: none;
             }
 
@@ -943,7 +941,7 @@
 
                         <div class="filter-section">
                             <h3>👀 Watch Status</h3>
-                            <div class="filter-buttons" id="physicalFormatFilters"></div>
+                            <div class="filter-buttons" id="watchedFilters"></div>
                         </div>
                     </div>
                 </div>
@@ -1335,7 +1333,7 @@
                 });
 
                 // Watched Status filters
-                const formatContainer = document.getElementById("physicalFormatFilters");
+                const formatContainer = document.getElementById("watchedFilters");
                 formatContainer.innerHTML = "";
                 ["All", "Watched", "Not Watched"].forEach((status) => {
                     const btn = document.createElement("button");
@@ -1487,7 +1485,7 @@
                             <h3>${row["Name"]}</h3>
                         </div>
                         <div class="card-badges">
-                            ${rating && rating !== "?" ? `<span class="badge ${isGoldRating ? 'rating-gold' : 'rating-orange'}">${rating}/11</span>` : ""}
+                            ${rating && rating !== "?" ? `<span class="badge ${isGoldRating ? 'rating-gold' : 'rating-orange'}">${rating}/10</span>` : ""}
                             <span class="badge ${row["Type"].toLowerCase()}">${row["Type"]}</span>
                             ${isWatched ? '<span class="badge rewatch">✅ Watched</span>' : '<span class="badge not-watched">⏳ Not Watched</span>'}
                         </div>
@@ -1540,7 +1538,7 @@
 
                 let html = `
                 <div class="modal-badges">
-                    ${rating && rating !== "?" ? `<span class="badge ${isGoldRating ? 'rating-gold' : 'rating-orange'}" style="font-size: 1em; padding: 8px 16px;">${rating}/11</span>` : ""}
+                    ${rating && rating !== "?" ? `<span class="badge ${isGoldRating ? 'rating-gold' : 'rating-orange'}" style="font-size: 1em; padding: 8px 16px;">${rating}/10</span>` : ""}
                     <span class="badge ${row["Type"].toLowerCase()}" style="font-size: 1em; padding: 8px 16px;">${row["Type"]}</span>
                     ${isWatched ? '<span class="badge rewatch" style="font-size: 1em; padding: 8px 16px;">✅ Watched</span>' : '<span class="badge not-watched" style="font-size: 1em; padding: 8px 16px;">⏳ Not Watched</span>'}
                 </div>
