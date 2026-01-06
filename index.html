@@ -165,6 +165,43 @@
                 transform: rotate(180deg);
             }
 
+            #sortSection {
+                background: rgba(255, 255, 255, 0.05);
+                border-radius: 15px;
+                padding: 20px;
+                margin-bottom: 20px;
+                border: 2px solid rgba(233, 69, 96, 0.3);
+                transition: all 0.3s ease;
+            }
+
+            #sortSection .collapse-header {
+                margin-bottom: 20px;
+                padding-bottom: 15px;
+                border-bottom: 2px solid rgba(233, 69, 96, 0.3);
+            }
+
+            #sortSection .collapse-header:hover {
+                color: #e94560;
+            }
+
+            #sortSection.collapsed {
+                padding: 15px 20px;
+            }
+
+            #sortSection.collapsed .collapse-header {
+                margin-bottom: 0;
+                padding-bottom: 0;
+                border-bottom: none;
+            }
+
+            #sortSection.collapsed .filter-buttons {
+                display: none;
+            }
+
+            #sortSection.collapsed .collapse-icon {
+                transform: rotate(180deg);
+            }
+
             .input-group {
                 margin-bottom: 15px;
             }
@@ -309,21 +346,20 @@
                 transform: scale(1.05);
             }
 
-            .sort-controls {
-                display: flex;
-                gap: 10px;
-                align-items: center;
-                flex-wrap: wrap;
+            .sort-section {
+                margin-bottom: 20px;
             }
 
-            .sort-controls select {
-                padding: 10px 16px;
-                border: 2px solid rgba(255, 255, 255, 0.2);
-                background: rgba(0, 0, 0, 0.3);
-                color: white;
-                border-radius: 10px;
-                font-size: 14px;
-                cursor: pointer;
+            .sort-section h3 {
+                margin-bottom: 10px;
+                font-size: 1em;
+                opacity: 0.9;
+            }
+
+            .sort-buttons {
+                display: flex;
+                gap: 8px;
+                flex-wrap: wrap;
             }
 
             .cards-grid {
@@ -357,7 +393,7 @@
                 left: 0;
                 width: 100%;
                 height: 4px;
-                background: linear-gradient(90deg, #e94560 0%, #8b0000 100%);
+                background: #8b0000;
             }
 
             .card:hover {
@@ -480,6 +516,12 @@
                 background: rgba(155, 89, 182, 0.3);
                 border: 1px solid #9b59b6;
                 color: #9b59b6;
+            }
+
+            .badge.ona {
+                background: rgba(26, 188, 156, 0.3);
+                border: 1px solid #1abc9c;
+                color: #1abc9c;
             }
 
             .badge.rewatch {
@@ -946,15 +988,12 @@
                     </div>
                 </div>
 
-                <div class="sort-controls">
-                    <label style="font-weight: 600">Sort by:</label>
-                    <select id="sortSelect" onchange="sortCards()">
-                        <option value="name">Name (A-Z)</option>
-                        <option value="rating-desc">
-                            Rating (High to Low)
-                        </option>
-                        <option value="rating-asc">Rating (Low to High)</option>
-                    </select>
+                <div id="sortSection" class="collapsed">
+                    <div class="collapse-header" onclick="toggleSort()">
+                        <h3>🔄 Sort By: <span id="currentSort">Name (A-Z)</span></h3>
+                        <span class="collapse-icon">▼</span>
+                    </div>
+                    <div class="filter-buttons" id="sortButtons"></div>
                 </div>
             </div>
 
@@ -1021,6 +1060,12 @@
             function toggleFilters() {
                 document
                     .getElementById("filtersSection")
+                    .classList.toggle("collapsed");
+            }
+
+            function toggleSort() {
+                document
+                    .getElementById("sortSection")
                     .classList.toggle("collapsed");
             }
 
@@ -1240,11 +1285,17 @@
                 const ova = allData.filter(
                     (r) => r["Type"] === "OVA",
                 ).length;
+                const ona = allData.filter(
+                    (r) => r["Type"] === "ONA",
+                ).length;
                 const watchedAnime = allData.filter(
                     (r) => r["Type"] === "Anime" && r["Watched"] === "Yes",
                 ).length;
                 const watchedOVA = allData.filter(
                     (r) => r["Type"] === "OVA" && r["Watched"] === "Yes",
+                ).length;
+                const watchedONA = allData.filter(
+                    (r) => r["Type"] === "ONA" && r["Watched"] === "Yes",
                 ).length;
 
                 statsEl.innerHTML = `
@@ -1261,12 +1312,20 @@
                     <div class="label">OVA</div>
                 </div>
                 <div class="stat-card">
+                    <div class="number">${ona}</div>
+                    <div class="label">ONA</div>
+                </div>
+                <div class="stat-card">
                     <div class="number">${watchedAnime}</div>
                     <div class="label">Watched Anime</div>
                 </div>
                 <div class="stat-card">
                     <div class="number">${watchedOVA}</div>
                     <div class="label">Watched OVA</div>
+                </div>
+                <div class="stat-card">
+                    <div class="number">${watchedONA}</div>
+                    <div class="label">Watched ONA</div>
                 </div>
             `;
             }
@@ -1275,7 +1334,7 @@
                 // Type filters
                 const typeContainer = document.getElementById("typeFilters");
                 typeContainer.innerHTML = "";
-                ["All", "Anime", "OVA"].forEach((type) => {
+                ["All", "Anime", "OVA", "ONA"].forEach((type) => {
                     const btn = document.createElement("button");
                     btn.className =
                         "filter-btn" + (type === "All" ? " active" : "");
@@ -1342,6 +1401,22 @@
                     btn.textContent = status;
                     btn.onclick = () => setFilter("watched", status.toLowerCase().replace(" ", "-"));
                     formatContainer.appendChild(btn);
+                });
+
+                // Sort buttons
+                const sortContainer = document.getElementById("sortButtons");
+                sortContainer.innerHTML = "";
+                const sortOptions = [
+                    { value: "name", label: "Name (A-Z)" },
+                    { value: "rating-desc", label: "Rating (High → Low)" },
+                    { value: "rating-asc", label: "Rating (Low → High)" }
+                ];
+                sortOptions.forEach((option, index) => {
+                    const btn = document.createElement("button");
+                    btn.className = "filter-btn" + (index === 0 ? " active" : "");
+                    btn.textContent = option.label;
+                    btn.onclick = () => setSort(option.value);
+                    sortContainer.appendChild(btn);
                 });
             }
 
@@ -1415,8 +1490,31 @@
                 displayCards(filtered);
             }
 
-            function sortCards() {
-                const sortBy = document.getElementById("sortSelect").value;
+            let currentSortBy = "name";
+            const sortLabels = {
+                "name": "Name (A-Z)",
+                "rating-desc": "Rating (High → Low)",
+                "rating-asc": "Rating (Low → High)"
+            };
+
+            function setSort(value) {
+                currentSortBy = value;
+
+                // Update current sort display
+                document.getElementById("currentSort").textContent = sortLabels[value];
+
+                // Update active state
+                document.querySelectorAll("#sortButtons .filter-btn").forEach(btn => {
+                    btn.classList.remove("active");
+                });
+                event.target.classList.add("active");
+
+                // Sort cards
+                sortCards(value);
+            }
+
+            function sortCards(sortBy = currentSortBy) {
+                currentSortBy = sortBy;
 
                 filteredData.sort((a, b) => {
                     switch (sortBy) {
